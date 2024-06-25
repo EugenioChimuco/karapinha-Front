@@ -1,0 +1,75 @@
+.carousel-container {
+  max-width: 100%;
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.carousel .control-prev.control-arrow,
+.carousel .control-next.control-arrow {
+  display: none; /* Hide the prev and next buttons */
+}
+
+.carousel-caption {
+  width: 100%;
+  position: absolute;
+  text-align: center;
+  font-size: 45px;
+  letter-spacing: 10px;
+  color: #59879d;
+  opacity: 0;
+  animation: slideUp 4s forwards, blur 4s forwards;
+  font-family: "DM Sans", sans-serif; /* Apply new font */
+  font-weight: 400; /* Set font weight */
+}
+
+.carousel-caption:hover {
+  color: #56cbf5;
+}
+
+@keyframes slideUp {
+  0% {
+    bottom: -50px;
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+  100% {
+    bottom: 50%;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes blur {
+  from {
+    filter: blur(10px);
+  }
+  to {
+    filter: blur(0);
+  }
+}
+
+.carousel-slide {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+body,
+html {
+  overflow: hidden;
+  height: 100%;
+}
+
+.dm-sans-carousel-caption {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}

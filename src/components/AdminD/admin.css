@@ -1,0 +1,137 @@
+/* admin.css */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto; /* Permite rolagem vertical na página */
+  height: 100vh; /* Garante que o body ocupe a altura total da janela */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 10px 20px;
+  color: white;
+}
+
+.navbar-brand {
+  font-size: 1.5em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-links a,
+.nav-links .nav-button {
+  color: white;
+  text-decoration: none;
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.nav-links .nav-button:hover,
+.nav-links a:hover {
+  background-color: #575757;
+  border-radius: 4px;
+}
+
+.container {
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 1200px;
+  height: calc(100vh - 100px); /* Ajusta a altura da área de conteúdo */
+  overflow-y: auto; /* Adiciona rolagem vertical na área de conteúdo */
+}
+
+.btn-primary {
+  background-color: #59879d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #2d7ba0;
+}
+
+.heading {
+  margin-top: 20px;
+  font-size: 1.5em;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.custom-table th {
+  background-color: #f2f2f2;
+}
+
+.custom-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.btn-danger,
+.btn-success,
+.btn-warning {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-success {
+  background-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.btn-primary {
+  background-color: #59879d;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2d7ba0;
+}

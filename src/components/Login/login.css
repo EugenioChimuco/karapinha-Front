@@ -1,0 +1,110 @@
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.login-title {
+  text-align: center;
+}
+
+.user-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.input-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input {
+  padding: 10px 20px; 
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+  width: calc(100% - 40px); 
+}
+
+.login-button {
+  padding: 10px 20px;
+  background-color: #59879d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-button:hover {
+  background-color: #2d7ba0;
+}
+
+.error-message-small {
+  color: red;
+  font-size: 12px; /* Texto pequeno */
+  margin-top: 5px;
+}
+
+.additional-links {
+  margin-top: 20px;
+}
+
+.additional-link {
+  margin-right: 20px;
+  color: #59879d;
+  text-decoration: none;
+}
+
+.additional-link:hover {
+  text-decoration: underline;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.social-icon {
+  font-size: 30px;
+  margin: 0 10px;
+  color: #59879d; /* Azul igual ao botão de entrar */
+}
+
+.social-icon:hover {
+  opacity: 0.7;
+}

@@ -6,9 +6,9 @@ const RegisterModal = ({ onClose }) => {
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [bi, setBi] = useState('');
   const [email, setEmail] = useState('');
-  const [fotoPath, setFotoPath] = useState('');
+  const [photo, setPhoto] = useState(null);
   const [phone, setPhone] = useState('');
-  const [IdCategoria, setIdCategoria] = useState('');
+  const [idCategoria, setIdCategoria] = useState('');
   const [error, setError] = useState('');
   const [categories, setCategories] = useState([]);
   const [horarios, setHorarios] = useState([]);
@@ -41,7 +41,7 @@ const RegisterModal = ({ onClose }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFotoPath(file.name);
+      setPhoto(file);
     }
   };
 
@@ -52,16 +52,22 @@ const RegisterModal = ({ onClose }) => {
 
   const handleRegister = async () => {
     try {
-      const userData = {
-        nomeCompleto,
-        bi,
-        email,
-        foto: fotoPath,
-        phone,
-        idCategoria: IdCategoria
+      const formData = new FormData();
+      formData.append('nomeCompleto', nomeCompleto);
+      formData.append('email', email);
+      formData.append('bi', bi);
+      formData.append('phone', phone);
+      formData.append('idCategoria', idCategoria);
+      formData.append('foto', photo);
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       };
 
-      const registerResponse = await axios.post('https://localhost:7143/api/Profissional', userData);
+      const registerResponse = await axios.post('https://localhost:7143/api/Profissional', formData, config);
+
       const idProfissional = registerResponse.data;
 
       const horariosData = {
@@ -69,11 +75,9 @@ const RegisterModal = ({ onClose }) => {
         idHorarios: selectedHorarios
       };
 
-      console.log('Horarios Data:', horariosData);
-
       const horariosResponse = await axios.post('https://localhost:7143/api/Profissional/adicionar-horarios', horariosData);
 
-      console.log('Registration successful!', horariosResponse.data);
+      console.log('Registro bem-sucedido!', horariosResponse.data);
       onClose();
     } catch (error) {
       if (error.response) {
@@ -145,10 +149,10 @@ const RegisterModal = ({ onClose }) => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="IdCategoria" className="input-label">Categoria</label>
+            <label htmlFor="idCategoria" className="input-label">Categoria</label>
             <select
-              id="IdCategoria"
-              value={IdCategoria}
+              id="idCategoria"
+              value={idCategoria}
               onChange={(e) => setIdCategoria(e.target.value)}
             >
               <option value="">Selecione uma categoria</option>

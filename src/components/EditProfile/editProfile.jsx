@@ -8,34 +8,28 @@ const EditProfileModal = ({ userId, onClose }) => {
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [bi, setBi] = useState('');
   const [email, setEmail] = useState('');
-  const [fotoPath, setFotoPath] = useState('');
+  const [foto, setFoto] = useState(null);
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
-      console.log('Fetching user data for userId:', userId); // Log para verificar o userId
-
       if (!userId) {
         setError('Usuário não logado.');
         return;
       }
 
       try {
-        const url = `https://localhost:7143/api/Utilizador/${userId}`;
-        console.log('API URL:', url); // Log para verificar a URL da API
-        const response = await axios.get(url);
+        const response = await axios.get(`https://localhost:7143/api/Utilizador/${userId}`);
         const userData = response.data;
-        console.log('User data fetched:', userData); // Log para verificar os dados recebidos
 
         setNomeCompleto(userData.nomeCompleto);
         setBi(userData.bi);
         setEmail(userData.email);
         setPhone(userData.phone);
-        // setFotoPath(userData.fotoPath);
       } catch (error) {
-        console.error('Error fetching user data:', error); // Log para verificar o erro
+        console.error('Error fetching user data:', error);
         setError('Não foi possível carregar os dados do usuário.');
       }
     };
@@ -46,7 +40,7 @@ const EditProfileModal = ({ userId, onClose }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFotoPath(file.name);
+      setFoto(file);
     }
   };
 
@@ -62,27 +56,24 @@ const EditProfileModal = ({ userId, onClose }) => {
         return;
       }
 
-      const userData = {
-        password,
-        nomeCompleto,
-        bi,
-        email,
-        foto: fotoPath,
-        phone,
-      };
+      const formData = new FormData();
+      formData.append('password', password);
+      formData.append('nomeCompleto', nomeCompleto);
+      formData.append('bi', bi);
+      formData.append('email', email);
+      formData.append('phone', phone);
+      if (foto) {
+        formData.append('foto', foto);
+      }
 
-      const url = `https://localhost:7143/api/Utilizador/AtualizarUtilizador/${userId}`;
-      console.log('Updating user data at URL:', url); // Log para verificar a URL da API
-      console.log('User data being sent:', userData); // Log para verificar os dados enviados
-      const response = await axios.put(url, userData);
+      const response = await axios.put(`https://localhost:7143/api/Utilizador/AtualizarUtilizador/${userId}`, formData);
 
-      console.log('Update successful!', response.data);
       setSuccessMessage('Dados atualizados com sucesso!');
       setTimeout(() => {
         onClose();
       }, 2000);
     } catch (error) {
-      console.error('Error updating user data:', error); // Log para verificar o erro
+      console.error('Error updating user data:', error);
       if (error.response) {
         setError('Ocorreu um erro ao tentar atualizar os dados. Por favor, tente novamente.');
       } else if (error.request) {

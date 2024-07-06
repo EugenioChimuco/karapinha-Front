@@ -6,7 +6,7 @@ import RegisterModal from './RegisterProfissional';
 import RegisterScheduleModal from './horario';
 import RegisterServiceModal from './RegisterServiceModal';
 import RegisterCategoryModal from './RegisterCategoryModal';
-import UpdateProfileModal from './UpdateProfileModal'; // Modal de atualização de perfil
+import UpdateProfileModal from './UpdateProfileModal';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -22,13 +22,12 @@ const Admin = () => {
   const [showRegisterScheduleModal, setShowRegisterScheduleModal] = useState(false);
   const [showRegisterServiceModal, setShowRegisterServiceModal] = useState(false);
   const [showRegisterCategoryModal, setShowRegisterCategoryModal] = useState(false);
-  const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false); // Estado para exibir o modal de atualização de perfil
+  const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [userProfile, setUserProfile] = useState(null); // Estado para armazenar perfil do usuário
-  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true'); // Estado para controlar o login
+  const [userProfile, setUserProfile] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
 
   useEffect(() => {
-    // Verifica o estado da conta ao montar o componente
     checkAccountStatus();
     fetchCategories();
     fetchProfessionals();
@@ -44,10 +43,9 @@ const Admin = () => {
 
   const checkAccountStatus = async () => {
     try {
-      const response = await axios.get('https://localhost:7143/api/Utilizador'); // Endpoint para buscar perfil do usuário
-      setUserProfile(response.data); // Armazena perfil do usuário no estado
+      const response = await axios.get('https://localhost:7143/api/Utilizador');
+      setUserProfile(response.data);
       if (!response.data.estadoDaConta) {
-        // Se o estadoDaConta for falso, exibe o modal de atualização de perfil
         setShowUpdateProfileModal(true);
       }
     } catch (error) {
@@ -55,17 +53,20 @@ const Admin = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.setItem('isLoggedIn', 'false');
     localStorage.removeItem('userId');
-    setIsLoggedIn(false); // Define isLoggedIn como falso ao sair
-    navigate('/');
+    setIsLoggedIn(false);
+    if (!userProfile.estadoDaConta) {
+      setShowUpdateProfileModal(true);
+    } else {
+      navigate('/');
+    }
   };
 
   const handleUpdateProfileClose = () => {
     setShowUpdateProfileModal(false);
     if (!userProfile.estadoDaConta) {
-      // Redireciona para a página inicial se o estadoDaConta ainda for falso após fechar o modal
       navigate('/');
     }
   };
@@ -106,7 +107,6 @@ const Admin = () => {
         return acc;
       }, {});
       setCategoriesMap(categoriesMap);
-      console.log('Categorias buscadas:', response.data); // Log de depuração
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
     }
@@ -117,7 +117,6 @@ const Admin = () => {
       const response = await axios.get('https://localhost:7143/api/Categoria');
       const activeCategories = response.data.filter(category => category.estadoCategoria);
       setActiveCategories(activeCategories);
-      console.log('Categorias ativas buscadas:', activeCategories); // Log de depuração
     } catch (error) {
       console.error('Erro ao buscar categorias ativas:', error);
     }

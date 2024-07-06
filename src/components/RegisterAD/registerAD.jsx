@@ -3,24 +3,25 @@ import axios from 'axios';
 import '../Register/register.css';
 
 const RegisterModal = ({ onClose }) => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [bi, setBi] = useState('');
   const [email, setEmail] = useState('');
-  const [fotoPath, setFotoPath] = useState('');
+  const [fotoPath, setFotoPath] = useState(null);
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFotoPath(file.name); 
+      setFotoPath(file);
     }
   };
 
   const handleRegister = async () => {
-    if (!nomeCompleto || !bi || !email || !phone || !password || !confirmPassword) {
+    if (!username || !password || !confirmPassword || !nomeCompleto || !bi || !email || !phone || !fotoPath) {
       setError('Todos os campos são obrigatórios.');
       return;
     }
@@ -31,17 +32,21 @@ const RegisterModal = ({ onClose }) => {
     }
 
     try {
-      const userData = {
-        password,
-        tipoDeUser: 2,
-        nomeCompleto,
-        bi,
-        email,
-        foto: fotoPath,
-        phone,
-      };
+      const formData = new FormData();
+      formData.append('userName', username);
+      formData.append('password', password);
+      formData.append('tipoDeUser', 2);
+      formData.append('nomeCompleto', nomeCompleto);
+      formData.append('bi', bi);
+      formData.append('email', email);
+      formData.append('foto', fotoPath);
+      formData.append('phone', phone);
 
-      const response = await axios.post('https://localhost:7143/api/Utilizador', userData);
+      const response = await axios.post('https://localhost:7143/api/Utilizador', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       console.log('Registration successful!', response.data);
       onClose();
@@ -63,6 +68,16 @@ const RegisterModal = ({ onClose }) => {
           <span className="close" onClick={onClose}>X</span>
           <h2 className="register-title">Registrar</h2>
           <form>
+            <div className="form-group">
+              <label htmlFor="username" className="input-label">Username</label>
+              <input
+                type="text"
+                id="username"
+                placeholder="Digite seu username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
             <div className="form-group">
               <label htmlFor="nomeCompleto" className="input-label">Nome Completo</label>
               <input

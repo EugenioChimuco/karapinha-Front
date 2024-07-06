@@ -3,19 +3,20 @@ import axios from 'axios';
 import './register.css';
 
 const RegisterModal = ({ onClose }) => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [bi, setBi] = useState('');
   const [email, setEmail] = useState('');
-  const [fotoPath, setFotoPath] = useState('');
   const [phone, setPhone] = useState('');
+  const [photo, setPhoto] = useState(null);
   const [error, setError] = useState('');
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFotoPath(file.name); 
+      setPhoto(file);
     }
   };
 
@@ -26,17 +27,23 @@ const RegisterModal = ({ onClose }) => {
     }
 
     try {
-      const userData = {
-        password,
-        tipoDeUser: 3,
-        nomeCompleto,
-        bi,
-        email,
-        foto: fotoPath, 
-        phone,
-      };
+      const formData = new FormData();
+      formData.append('UserName', username);
+      formData.append('Password', password);
+      formData.append('TipoDeUser', 3); // Assuming 3 is the user type you want to set
+      formData.append('NomeCompleto', nomeCompleto);
+      formData.append('BI', bi);
+      formData.append('Email', email);
+      formData.append('Phone', phone);
+      if (photo) {
+        formData.append('Foto', photo);
+      }
 
-      const response = await axios.post('https://localhost:7143/api/Utilizador', userData);
+      const response = await axios.post('https://localhost:7143/api/Utilizador', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
       console.log('Registration successful!', response.data);
       onClose();
@@ -57,6 +64,16 @@ const RegisterModal = ({ onClose }) => {
         <span className="close" onClick={onClose}>X</span>
         <h2 className="register-title">Registrar</h2>
         <form>
+          <div className="form-group">
+            <label htmlFor="username" className="input-label">Nome de Usuário</label>
+            <input
+              type="text"
+              id="username"
+              placeholder="Digite seu nome de usuário"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
           <div className="form-group">
             <label htmlFor="nomeCompleto" className="input-label">Nome Completo</label>
             <input

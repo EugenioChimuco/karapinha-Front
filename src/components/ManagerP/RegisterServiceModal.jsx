@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../Register/register.css';
-import './RegisterServiceModal.css'
+import './RegisterServiceModal.css';
 
 const RegisterServiceModal = ({ onClose, onRegister }) => {
   const [serviceType, setServiceType] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [price, setPrice] = useState('');
+  const [photo, setPhoto] = useState(null);
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState('');
 
@@ -17,7 +18,8 @@ const RegisterServiceModal = ({ onClose, onRegister }) => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get('https://localhost:7143/api/Categoria');
-      setCategories(response.data);
+      const activeCategories = response.data.filter(category => category.estadoCategoria === true);
+      setCategories(activeCategories);
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
     }
@@ -25,14 +27,21 @@ const RegisterServiceModal = ({ onClose, onRegister }) => {
 
   const handleRegister = async () => {
     try {
-      const serviceData = {
-        tipoDeServico: serviceType,
-        idCategoria: categoryId,
-        precoDoServico: price,
-      };
+      const formData = new FormData();
+      formData.append('tipoDeServico', serviceType);
+      formData.append('idCategoria', categoryId);
+      formData.append('precoDoServico', price);
+      if (photo) {
+        formData.append('foto', photo);
+      }
 
-      await axios.post('https://localhost:7143/api/Servico/Adicionar', serviceData);
-      onRegister(serviceData);
+      await axios.post('https://localhost:7143/api/Servico/Adicionar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      onRegister();
       onClose();
     } catch (error) {
       console.error('Erro ao registrar serviço:', error);
@@ -80,6 +89,14 @@ const RegisterServiceModal = ({ onClose, onRegister }) => {
               placeholder="Digite o preço"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="photo" className="input-label">Foto</label>
+            <input
+              type="file"
+              id="photo"
+              onChange={(e) => setPhoto(e.target.files[0])}
             />
           </div>
           {error && <p className="error-message">{error}</p>}

@@ -39,7 +39,6 @@ const Menu = () => {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userId', userId);
     setUserId(userId);
-    setIsModalOpen(false); // Fechar o modal de login após o sucesso
   };
 
   const toggleDropdown = () => {

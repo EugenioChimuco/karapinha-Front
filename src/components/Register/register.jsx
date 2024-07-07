@@ -30,7 +30,7 @@ const RegisterModal = ({ onClose }) => {
       const formData = new FormData();
       formData.append('UserName', username);
       formData.append('Password', password);
-      formData.append('TipoDeUser', 3); // Assuming 3 is the user type you want to set
+      formData.append('TipoDeUser', 3); 
       formData.append('NomeCompleto', nomeCompleto);
       formData.append('BI', bi);
       formData.append('Email', email);

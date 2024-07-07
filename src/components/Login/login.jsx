@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import './login.css';
 import { RiUserLine } from 'react-icons/ri';
 import { FaFacebookSquare, FaTwitterSquare, FaInstagramSquare } from 'react-icons/fa';
 import RegisterModal from '../Register/register';
 import { useNavigate } from "react-router-dom";
-
 
 const LoginModal = ({ onClose, onSuccess }) => {
   const [username, setUsername] = useState('');
@@ -14,27 +13,34 @@ const LoginModal = ({ onClose, onSuccess }) => {
   const [showRegister, setShowRegister] = useState(false);
   const navigate = useNavigate();
 
-
   const handleLogin = async () => {
     try {
-      const response  = await axios.post('https://localhost:7143/api/Utilizador/login', {
+      const response = await axios.post('https://localhost:7143/api/Utilizador/login', {
         username,
         password
       });
 
       console.log('Login successful!', response.data);
       const userId = response.data.id; 
-      onSuccess(userId); 
-      onClose();
       
-      if(response?.data?.tipoDeUser === 1) {
+      if (response?.data?.tipoDeUser === 1) {
+        onSuccess(userId); 
+        onClose();
         navigate("/admin");
-      }else if(response?.data?.tipoDeUser === 2){
+      } else if (response?.data?.tipoDeUser === 2) {
+        onSuccess(userId); 
+        onClose();
         navigate("/manager");
+      } else if (response?.data?.tipoDeUser === 3) {
+        console.log('estadoDoUtilizador:', response?.data?.estadoDoUtilizador);
+        if (response?.data?.estadoDoUtilizador) {
+          onSuccess(userId); 
+          onClose();
+          navigate("/");
+        } else { 
+          setError('A sua conta está inativa! Aguarde a ativação da mesma.');
+        }
       }
-
-
-      
 
     } catch (error) {
       if (error.response) {

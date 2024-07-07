@@ -1,18 +1,20 @@
-import { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { TiShoppingCart } from 'react-icons/ti';
 import './menu.css';
 import LoginModal from '../Login/login';
 import EditProfileModal from '../EditProfile/editProfile';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Link } from 'react-router-dom';
-
+import { CartContext } from '../CartContext/CartContext';
+import CartModal from '../CartModal/CartModal';
 
 const Menu = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [userId, setUserId] = useState(null);
+  const { cartItems } = useContext(CartContext);
 
   useEffect(() => {
     const loggedInStatus = localStorage.getItem('isLoggedIn') === 'true';
@@ -37,6 +39,7 @@ const Menu = () => {
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userId', userId);
     setUserId(userId);
+    setIsModalOpen(false); // Fechar o modal de login após o sucesso
   };
 
   const toggleDropdown = () => {
@@ -48,19 +51,22 @@ const Menu = () => {
     setIsDropdownOpen(false);
   };
 
+  const handleCartClick = () => {
+    setIsCartModalOpen(true);
+  };
+
   return (
     <div className="menu">
-       <span href="/" className="logo">Karapinha</span>
+      <span href="/" className="logo">Karapinha</span>
       <nav>
         <ul>
           <li><a href="/" className="menu-item">Home</a></li>
           <li><a href="#" className="menu-item">Sobre</a></li>
           <li><a href="/servicos" className="menu-item">Serviços</a></li>
-          <div className='DivCarrinho'>
-          <TiShoppingCart className="Carrinho"/>
-          <span>0</span>
+          <div className='DivCarrinho' onClick={handleCartClick}>
+            <TiShoppingCart className="Carrinho"/>
+            <span>{cartItems.length}</span>
           </div>
-         
         </ul>
       </nav>
       
@@ -84,6 +90,7 @@ const Menu = () => {
 
       {isModalOpen && <LoginModal onClose={() => setIsModalOpen(false)} onSuccess={handleLoginSuccess} />}
       {isEditProfileModalOpen && <EditProfileModal userId={userId} onClose={() => setIsEditProfileModalOpen(false)} />}
+      {isCartModalOpen && <CartModal onClose={() => setIsCartModalOpen(false)} />}
     </div>
   );
 };

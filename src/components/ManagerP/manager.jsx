@@ -6,7 +6,7 @@ import RegisterModal from './RegisterProfissional';
 import RegisterScheduleModal from './horario';
 import RegisterServiceModal from './RegisterServiceModal';
 import RegisterCategoryModal from './RegisterCategoryModal';
-import UpdateProfileModal from './UpdateProfileModal'; // Modal de atualização de perfil
+
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -22,39 +22,39 @@ const Admin = () => {
   const [showRegisterScheduleModal, setShowRegisterScheduleModal] = useState(false);
   const [showRegisterServiceModal, setShowRegisterServiceModal] = useState(false);
   const [showRegisterCategoryModal, setShowRegisterCategoryModal] = useState(false);
-  const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false); // Estado para exibir o modal de atualização de perfil
   const [refreshKey, setRefreshKey] = useState(0);
-  const [userProfile, setUserProfile] = useState(null); // Estado para armazenar perfil do usuário
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true'); // Estado para controlar o login
 
+
   useEffect(() => {
-    // Verifica o estado da conta ao montar o componente
-    checkAccountStatus();
     fetchCategories();
     fetchProfessionals();
-  }, []);
+    fetchActiveCategories();
+    fetchServices();
+    fetchSchedules();
+    fetchAppointments();
+
+    const intervalId = setInterval(() => {
+      fetchCategories();
+      fetchProfessionals();
+      fetchActiveCategories();
+      fetchServices();
+      fetchSchedules();
+      fetchAppointments();
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [refreshKey]); // Adicione refreshKey como dependência aqui
 
   useEffect(() => {
-    if (activeTab === 'professional') fetchProfessionals();
-    if (activeTab === 'services') fetchServices();
-    if (activeTab === 'schedule') fetchSchedules();
-    if (activeTab === 'appointments') fetchAppointments();
-    if (activeTab === 'categories') fetchActiveCategories();
+    fetchCategories();
+    fetchProfessionals();
+    fetchActiveCategories();
+    fetchServices();
+    fetchSchedules();
+    fetchAppointments();
   }, [activeTab, refreshKey]);
-
-  const checkAccountStatus = async () => {
-    try {
-      const response = await axios.get('https://localhost:7143/api/Utilizador'); // Endpoint para buscar perfil do usuário
-      setUserProfile(response.data); // Armazena perfil do usuário no estado
-      if (!response.data.estadoDaConta) {
-        // Se o estadoDaConta for falso, exibe o modal de atualização de perfil
-        setShowUpdateProfileModal(true);
-      }
-    } catch (error) {
-      console.error('Erro ao verificar estado da conta:', error);
-    }
-  };
-
+ 
   const handleLogout = () => {
     localStorage.setItem('isLoggedIn', 'false');
     localStorage.removeItem('userId');
@@ -62,14 +62,7 @@ const Admin = () => {
     navigate('/');
   };
 
-  const handleUpdateProfileClose = () => {
-    setShowUpdateProfileModal(false);
-    if (!userProfile.estadoDaConta) {
-      // Redireciona para a página inicial se o estadoDaConta ainda for falso após fechar o modal
-      navigate('/');
-    }
-  };
-
+ 
   const fetchProfessionals = async () => {
     try {
       const response = await axios.get('https://localhost:7143/api/Profissional/listarProfissionalComHorarios');
@@ -433,7 +426,7 @@ const Admin = () => {
       {showRegisterScheduleModal && <RegisterScheduleModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
       {showRegisterServiceModal && <RegisterServiceModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
       {showRegisterCategoryModal && <RegisterCategoryModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
-      {showUpdateProfileModal && <UpdateProfileModal onClose={handleUpdateProfileClose} />}
+      
     </div>
   );
 };

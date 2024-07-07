@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { CartContext } from '../CartContext/CartContext';
 import './Marcacao.css';
 
 const Modal = ({ servico, onClose }) => {
@@ -9,6 +10,7 @@ const Modal = ({ servico, onClose }) => {
   const [horario, setHorario] = useState('');
   const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
   const [marcacoes, setMarcacoes] = useState([]);
+  const { addToCart } = useContext(CartContext);
 
   useEffect(() => {
     const fetchProfissionais = async () => {
@@ -47,11 +49,19 @@ const Modal = ({ servico, onClose }) => {
   }, [data, profissionalSelecionado, profissionais, marcacoes]);
 
   const handleSubmit = () => {
-    // Lógica para adicionar ao carrinho ou agendar
+    const profissional = profissionais.find(p => p.idProfissional === parseInt(profissionalSelecionado));
+    const selectedService = {
+      tipoDeServico: servico.tipoDeServico,
+      precoDoServico: servico.precoDoServico,
+      nomeProfissional: profissional ? profissional.nomeCompleto : '',
+      data,
+      horario,
+    };
+
+    addToCart(selectedService);  // Add to cart
     onClose();
   };
 
-  // Obter a data atual no formato YYYY-MM-DD
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -60,7 +70,7 @@ const Modal = ({ servico, onClose }) => {
         <span className="close" onClick={onClose}>×</span>
         <h2>Agendar Serviço</h2>
         <div className="form-group">
-          <br />  
+          <br />
           <label htmlFor="profissional">Profissional:</label>
           <select
             id="profissional"
@@ -81,7 +91,7 @@ const Modal = ({ servico, onClose }) => {
             type="date"
             id="data"
             value={data}
-            min={today}  
+            min={today}
             onChange={(e) => setData(e.target.value)}
           />
         </div>

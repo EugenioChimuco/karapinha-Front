@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { CartContext } from '../CartContext/CartContext';
 import './CartModal.css';
 import jsPDF from 'jspdf';
@@ -22,6 +23,7 @@ const CartModal = ({ onClose }) => {
     if (!isLoggedIn) {
       setIsLoginModalOpen(true);
     } else {
+      submitBooking();
       generatePDF();
       clearCart();
       onClose();
@@ -34,6 +36,7 @@ const CartModal = ({ onClose }) => {
     localStorage.setItem('userId', userId);
     setUserId(userId);
     setIsLoginModalOpen(false);
+    submitBooking();
     generatePDF();
     clearCart();
     onClose();
@@ -43,6 +46,40 @@ const CartModal = ({ onClose }) => {
     clearCart();
     onClose();
   };
+
+  const submitBooking = async () => {
+    const bookingData = {
+      dataDeMarcacao: new Date().toISOString().split('T')[0],
+      precoDaMarcacao: calculateTotal(),
+      idUtilizador: userId,
+      listaMarcacoes: cartItems
+      .map(item => ({
+        idServico: item.idServico,
+        idProfissional: item.idProfissional,
+        dataMarcacao: item.data,
+        horaMarcacao: item.horario 
+      }))
+      .filter(item => item.idServico && item.idProfissional)
+    };
+  
+    console.log('Dados da marcação enviados:', bookingData);
+  
+    try {
+      const response = await axios.post('https://localhost:7143/api/Marcacao/criar-com-servicos', bookingData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+        
+      console.log('Marcação criada com sucesso:', response.data);
+    } catch (error) {
+      console.error('Erro ao criar a marcação:', error);
+      if (error.response) {
+        console.error('Resposta do servidor:', error.response.data);
+      }
+    }
+  };
+  
 
   const generatePDF = () => {
     const doc = new jsPDF();
@@ -92,12 +129,12 @@ const CartModal = ({ onClose }) => {
     doc.setFontSize(12);
     doc.text(`Total: ${calculateTotal()}kz`, 20, yPos);
 
-    yPos += 40; 
+    yPos += 40;
     doc.setFont('cursive');
     doc.setFontSize(24);
     doc.text('Muito obrigado!', 105, yPos, { align: 'center' });
 
-    const rodapeY = doc.internal.pageSize.height - 20; 
+    const rodapeY = doc.internal.pageSize.height - 20;
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.text('KarapinhaXPTO', 105, rodapeY, { align: 'center' });

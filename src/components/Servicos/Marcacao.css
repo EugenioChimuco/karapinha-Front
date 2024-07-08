@@ -84,3 +84,7 @@ h3 {
   margin-bottom: 10px;
 }
 
+.indisponivel-msg {
+  color: red; /* ou qualquer outra cor desejada */
+  font-weight: bold;
+}

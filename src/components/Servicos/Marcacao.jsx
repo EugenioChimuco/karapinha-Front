@@ -4,13 +4,14 @@ import { CartContext } from '../CartContext/CartContext';
 import './Marcacao.css';
 
 const Modal = ({ servico, onClose }) => {
+  const { addToCart } = useContext(CartContext);
   const [profissionais, setProfissionais] = useState([]);
   const [profissionalSelecionado, setProfissionalSelecionado] = useState('');
   const [data, setData] = useState('');
   const [horario, setHorario] = useState('');
   const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
   const [marcacoes, setMarcacoes] = useState([]);
-  const { addToCart } = useContext(CartContext);
+  const [indisponivelMensagem, setIndisponivelMensagem] = useState(false); // Estado para controlar a mensagem de indisponibilidade
 
   useEffect(() => {
     const fetchProfissionais = async () => {
@@ -23,42 +24,58 @@ const Modal = ({ servico, onClose }) => {
       }
     };
 
-    const fetchMarcacoes = async () => {
-      try {
-        const response = await axios.get('https://localhost:7143/api/Marcacao/ListarTodas');
-        setMarcacoes(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar marcações:', error);
-      }
-    };
-
     fetchProfissionais();
-    fetchMarcacoes();
   }, [servico.idCategoria]);
 
   useEffect(() => {
-    if (data && profissionalSelecionado) {
+    const fetchMarcacoes = async () => {
+      if (profissionalSelecionado && data) {
+        try {
+          const response = await axios.get(`https://localhost:7143/api/Marcacao/ListarPorProfissionalData/${profissionalSelecionado}/${data}`);
+          setMarcacoes(response.data);
+        } catch (error) {
+          console.error('Erro ao buscar marcações:', error);
+          setMarcacoes([]); // Limpa as marcações em caso de erro para evitar problemas futuros
+        }
+      }
+    };
+
+    fetchMarcacoes();
+  }, [profissionalSelecionado, data]);
+
+  useEffect(() => {
+    if (profissionalSelecionado && profissionais.length > 0) {
       const profissional = profissionais.find(p => p.idProfissional === parseInt(profissionalSelecionado));
-      if (profissional) {
+      if (profissional && profissional.horarios) {
         const horariosFiltrados = profissional.horarios.filter(horario => 
-          !marcacoes.some(m => m.data === data && m.horario === horario && m.idProfissional === profissional.idProfissional)
+          !marcacoes.some(m => m.horaMarcacao === horario)
         );
         setHorariosDisponiveis(horariosFiltrados);
+        setIndisponivelMensagem(horariosFiltrados.length === 0); // Mostra a mensagem se não houver horários disponíveis
+      } else {
+        setHorariosDisponiveis([]);
+        setIndisponivelMensagem(true); // Mostra mensagem se não houver horários devido a problemas no backend
       }
+    } else {
+      setHorariosDisponiveis([]);
+      setIndisponivelMensagem(false);
     }
-  }, [data, profissionalSelecionado, profissionais, marcacoes]);
+  }, [profissionalSelecionado, marcacoes, profissionais]);
 
   const handleSubmit = () => {
     const profissional = profissionais.find(p => p.idProfissional === parseInt(profissionalSelecionado));
+
     const selectedService = {
+      idServico: servico.idServico,
+      idProfissional: profissional ? profissional.idProfissional : undefined,
       tipoDeServico: servico.tipoDeServico,
       precoDoServico: servico.precoDoServico,
       nomeProfissional: profissional ? profissional.nomeCompleto : '',
       data,
-      horario,
+      horario
     };
 
-    addToCart(selectedService);  // Add to cart
+    addToCart(selectedService);
     onClose();
   };
 
@@ -110,6 +127,9 @@ const Modal = ({ servico, onClose }) => {
             ))}
           </select>
         </div>
+        {indisponivelMensagem && (
+          <p className="indisponivel-msg">Não há horários disponíveis para o profissional selecionado neste dia.</p>
+        )}
         <hr />
         <div>
           <h3>Detalhes do Serviço</h3>
@@ -117,7 +137,7 @@ const Modal = ({ servico, onClose }) => {
           <p><strong>Preço:</strong> {servico.precoDoServico}kz</p>
         </div>
         <div className="modal-actions">
-          <button onClick={handleSubmit}>Adicionar ao Carrinho</button>
+          <button onClick={handleSubmit} disabled={horario === '' || profissionalSelecionado === '' || data === ''}>Adicionar ao Carrinho</button>
         </div>
       </div>
     </div>

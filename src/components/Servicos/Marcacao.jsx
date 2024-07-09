@@ -12,6 +12,7 @@ const Modal = ({ servico, onClose }) => {
   const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
   const [marcacoes, setMarcacoes] = useState([]);
   const [indisponivelMensagem, setIndisponivelMensagem] = useState(false); // Estado para controlar a mensagem de indisponibilidade
+  const [formValido, setFormValido] = useState(false); // Estado para controlar a validação do formulário
 
   useEffect(() => {
     const fetchProfissionais = async () => {
@@ -61,6 +62,15 @@ const Modal = ({ servico, onClose }) => {
       setIndisponivelMensagem(false);
     }
   }, [profissionalSelecionado, marcacoes, profissionais]);
+
+  useEffect(() => {
+    // Verifica se todos os campos obrigatórios estão preenchidos
+    if (profissionalSelecionado && data && horario) {
+      setFormValido(true);
+    } else {
+      setFormValido(false);
+    }
+  }, [profissionalSelecionado, data, horario]);
 
   const handleSubmit = () => {
     const profissional = profissionais.find(p => p.idProfissional === parseInt(profissionalSelecionado));
@@ -137,7 +147,7 @@ const Modal = ({ servico, onClose }) => {
           <p><strong>Preço:</strong> {servico.precoDoServico}kz</p>
         </div>
         <div className="modal-actions">
-          <button onClick={handleSubmit} disabled={horario === '' || profissionalSelecionado === '' || data === ''}>Adicionar ao Carrinho</button>
+          <button onClick={handleSubmit} disabled={!formValido}>Adicionar ao Carrinho</button>
         </div>
       </div>
     </div>

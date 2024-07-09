@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import 'react-datepicker/dist/react-datepicker.css';
 import './manager.css';
 import { useNavigate } from 'react-router-dom';
 import RegisterModal from './RegisterProfissional';
 import RegisterScheduleModal from './horario';
 import RegisterServiceModal from './RegisterServiceModal';
 import RegisterCategoryModal from './RegisterCategoryModal';
+import EditAppointmentModal from '../EditAppointmentModal/EditAppointmentModal';
 
 
 const Admin = () => {
@@ -23,7 +25,10 @@ const Admin = () => {
   const [showRegisterServiceModal, setShowRegisterServiceModal] = useState(false);
   const [showRegisterCategoryModal, setShowRegisterCategoryModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true'); // Estado para controlar o login
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true'); 
+  const [appointmentsWithServices, setAppointmentsWithServices] = useState([]);
+  const [editAppointment, setEditAppointment] = useState(null);
+
 
 
   useEffect(() => {
@@ -32,7 +37,7 @@ const Admin = () => {
     fetchActiveCategories();
     fetchServices();
     fetchSchedules();
-    fetchAppointments();
+    fetchAppointmentsWithServices();
 
     const intervalId = setInterval(() => {
       fetchCategories();
@@ -40,11 +45,12 @@ const Admin = () => {
       fetchActiveCategories();
       fetchServices();
       fetchSchedules();
-      fetchAppointments();
+      fetchAppointmentsWithServices();
+
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [refreshKey]); // Adicione refreshKey como dependência aqui
+  }, [refreshKey]); 
 
   useEffect(() => {
     fetchCategories();
@@ -52,23 +58,26 @@ const Admin = () => {
     fetchActiveCategories();
     fetchServices();
     fetchSchedules();
-    fetchAppointments();
+   fetchAppointmentsWithServices();
   }, [activeTab, refreshKey]);
- 
+  
   const handleLogout = () => {
     localStorage.setItem('isLoggedIn', 'false');
     localStorage.removeItem('userId');
-    setIsLoggedIn(false); // Define isLoggedIn como falso ao sair
+    setIsLoggedIn(false); 
     navigate('/');
   };
 
+  const handleCloseEditAppointmentModal = () => {
+    setEditAppointment(null);
+  };
  
   const fetchProfessionals = async () => {
     try {
       const response = await axios.get('https://localhost:7143/api/Profissional/listarProfissionalComHorarios');
       setProfessionals(response.data);
     } catch (error) {
-      console.error('Erro ao buscar profissionais:', error);
+     // console.error('Erro ao buscar profissionais:', error);
     }
   };
 
@@ -77,19 +86,28 @@ const Admin = () => {
       const response = await axios.get('https://localhost:7143/api/Servico/ListarTodos');
       setServices(response.data);
     } catch (error) {
-      console.error('Erro ao buscar serviços:', error);
+      //console.error('Erro ao buscar serviços:', error);
     }
   };
 
-  const fetchAppointments = async () => {
+  const fetchAppointmentsWithServices = async () => {
     try {
-      const response = await axios.get('https://localhost:7143/api/Marcacao');
-      setAppointments(response.data);
+      const response = await axios.get('https://localhost:7143/api/Marcacao/marcacoes-com-servicos');
+      const appointmentsData = response.data;
+      const appointmentsWithUserNames = await Promise.all(appointmentsData.map(async (appointment) => {
+        const userName = await fetchUserName(appointment.idUtilizador);
+        return {
+          ...appointment,
+          nomeDoUtilizador: userName
+        };
+      }));
+  
+      setAppointmentsWithServices(appointmentsWithUserNames);
     } catch (error) {
-      console.error('Erro ao buscar marcações:', error);
+    //  console.error('Erro ao buscar marcações com serviços:', error);
     }
   };
-
+   
   const fetchCategories = async () => {
     try {
       const response = await axios.get('https://localhost:7143/api/Categoria');
@@ -99,9 +117,9 @@ const Admin = () => {
         return acc;
       }, {});
       setCategoriesMap(categoriesMap);
-      console.log('Categorias buscadas:', response.data); // Log de depuração
+     
     } catch (error) {
-      console.error('Erro ao buscar categorias:', error);
+    //  console.error('Erro ao buscar categorias:', error);
     }
   };
 
@@ -110,9 +128,8 @@ const Admin = () => {
       const response = await axios.get('https://localhost:7143/api/Categoria');
       const activeCategories = response.data.filter(category => category.estadoCategoria);
       setActiveCategories(activeCategories);
-      console.log('Categorias ativas buscadas:', activeCategories); // Log de depuração
     } catch (error) {
-      console.error('Erro ao buscar categorias ativas:', error);
+     // console.error('Erro ao buscar categorias ativas:', error);
     }
   };
 
@@ -121,10 +138,19 @@ const Admin = () => {
       const response = await axios.get('https://localhost:7143/api/Horario');
       setSchedules(response.data);
     } catch (error) {
-      console.error('Erro ao buscar horários:', error);
+     // console.error('Erro ao buscar horários:', error);
     }
   };
 
+  const fetchUserName = async (idUtilizador) => {
+    try {
+      const response = await axios.get(`https://localhost:7143/api/Utilizador/${idUtilizador}`);
+      return response.data.nomeCompleto;
+    } catch (error) {
+      return 'Carregando...';
+    }
+  };
+  
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
@@ -168,22 +194,13 @@ const Admin = () => {
 
   const handleAcceptAppointment = async (idMarcacao) => {
     try {
-      await axios.put(`https://localhost:7143/api/Marcacao/${idMarcacao}`, { estadoDeMarcacao: 'confirmado' });
+      await axios.put(`https://localhost:7143/api/Marcacao/AceitarPedidoDeMarcacao/${idMarcacao}`);
       setRefreshKey(oldKey => oldKey + 1);
     } catch (error) {
       console.error('Erro ao confirmar marcação:', error);
     }
   };
-
-  const handleRejectAppointment = async (idMarcacao) => {
-    try {
-      await axios.put(`https://localhost:7143/api/MarcacaoServico/${idMarcacao}`, { estadoDeMarcacao: 'negado' });
-      setRefreshKey(oldKey + 1);
-    } catch (error) {
-      console.error('Erro ao negar marcação:', error);
-    }
-  };
-
+  
   const handleShowRegisterModal = () => {
     if (activeTab === 'schedule') {
       setShowRegisterScheduleModal(true);
@@ -204,10 +221,30 @@ const Admin = () => {
     } else if (activeTab === 'categories') {
       setShowRegisterCategoryModal(false);
     } else {
-      setShowRegisterModal(false);
+      setShowRegisterModal(false);A
     }
   };
 
+  const handleEditAppointmentDate = (idMarcacao) => {
+    const appointmentToEdit = appointmentsWithServices.find(appointment => appointment.idMarcacao === idMarcacao);
+    setEditAppointment(appointmentToEdit);
+  };
+
+  const handleUpdateAppointment = async (updatedAppointment) => {
+    try {
+      const response = await axios.put(
+        `https://localhost:7143/api/Marcacao/atualizar-data/${updatedAppointment.idMarcacao}`,
+        { novaData: updatedAppointment.novaData } // Certifique-se de enviar os dados corretamente
+      );
+      console.log('Resposta da requisição:', response.data);
+      setRefreshKey(oldKey => oldKey + 1);
+      handleCloseEditAppointmentModal();
+    } catch (error) {
+      console.error('Erro ao editar data da marcação:', error);
+    }
+  };
+  
+    
   const handleRegister = async (data) => {
     try {
       if (activeTab === 'schedule') {
@@ -229,6 +266,7 @@ const Admin = () => {
   const renderTable = () => {
     switch (activeTab) {
       case 'professional':
+        
         return (
           <table className="custom-table">
             <thead>
@@ -264,6 +302,7 @@ const Admin = () => {
             </tbody>
           </table>
         );
+  
       case 'services':
         return (
           <table className="custom-table">
@@ -294,6 +333,7 @@ const Admin = () => {
             </tbody>
           </table>
         );
+  
       case 'schedule':
         return (
           <table className="custom-table">
@@ -322,39 +362,56 @@ const Admin = () => {
             </tbody>
           </table>
         );
-      case 'appointments':
+  
+        case 'appointments':
         return (
           <table className="custom-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Cliente</th>
+                <th>ID MARCAÇÃO</th>
+                <th>Clientes</th>
+                <th>Profissionais</th>
+                <th>Serviços</th>
                 <th>Data</th>
-                <th>Preço</th>
+                <th>Hora</th>
                 <th>Estado</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {appointments.map((appointment) => (
+              {appointmentsWithServices.map((appointment) => (
                 <tr key={appointment.idMarcacao}>
                   <td>{appointment.idMarcacao}</td>
-                  <td>{appointment.idUtilizador}</td>
+                  <td>{appointment.nomeDoUtilizador}</td>
+                  <td>{appointment.listaMarcacoes.map((item) => {
+                    const professional = professionals.find(prof => prof.idProfissional === item.idProfissional);
+                    return <div key={item.idMarcacaoServico}>{professional ? professional.nomeCompleto : 'Carregando...'}</div>;
+                  })}</td>
+                  <td>{appointment.listaMarcacoes.map((item) => {
+                    const service = services.find(serv => serv.idServico === item.idServico);
+                    return <div key={item.idMarcacaoServico}>{service ? service.tipoDeServico : 'Carregando...'}</div>;
+                  })}</td>
                   <td>{appointment.dataDeMarcacao}</td>
-                  <td>{appointment.precoDaMarcacao}</td>
-                  <td>{appointment.estadoDeMarcacao ? 'Aceito' : 'Negado'}</td>
+                  <td>{appointment.listaMarcacoes.map((item) => (
+                    <div key={item.idMarcacaoServico}>{item.horaMarcacao}</div>
+                  ))}</td>
+                  <td>{appointment.estadoDeMarcacao ? 'Confirmado' : 'Pendente'}</td>
                   <td>
+                    {appointment.estadoDeMarcacao === false && (
+                      <>
+                        <button
+                          className="btn-accept"
+                          onClick={() => handleAcceptAppointment(appointment.idMarcacao)}
+                        >
+                          Aceitar
+                        </button>
+                      </>
+                    )}
                     <button
-                      className="btn-remove"
-                      onClick={() => handleRejectAppointment(appointment.idMarcacao)}
+                      className="btn-edit"
+                      onClick={() => handleEditAppointmentDate(appointment.idMarcacao)}
                     >
-                      Negar
-                    </button>
-                    <button
-                      className="btn-confirm"
-                      onClick={() => handleAcceptAppointment(appointment.idMarcacao)}
-                    >
-                      Aceitar
+                      Editar Data
                     </button>
                   </td>
                 </tr>
@@ -362,7 +419,9 @@ const Admin = () => {
             </tbody>
           </table>
         );
+  
       case 'categories':
+  
         return (
           <table className="custom-table">
             <thead>
@@ -391,11 +450,12 @@ const Admin = () => {
             </tbody>
           </table>
         );
+  
       default:
         return null;
     }
   };
-
+  
   return (
     <div className="admin-container">
       <div className="navbar">
@@ -421,6 +481,13 @@ const Admin = () => {
         <h2 className="heading">{activeTab === 'professional' ? 'Profissionais' : activeTab === 'services' ? 'Serviços' : activeTab === 'schedule' ? 'Horários' : activeTab === 'categories' ? 'Categorias' : 'Marcações'}</h2>
         {renderTable()}
       </div>
+
+      <EditAppointmentModal
+        show={!!editAppointment} 
+        onClose={handleCloseEditAppointmentModal} 
+        appointment={editAppointment} 
+        onUpdate={handleUpdateAppointment}
+      />
 
       {showRegisterModal && <RegisterModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
       {showRegisterScheduleModal && <RegisterScheduleModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}

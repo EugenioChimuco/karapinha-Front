@@ -13,6 +13,9 @@ const RegisterModal = ({ onClose }) => {
   const [photo, setPhoto] = useState(null);
   const [error, setError] = useState('');
 
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/;
+  const phoneRegex = /^[0-9]{9}$/;
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -23,6 +26,16 @@ const RegisterModal = ({ onClose }) => {
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError('As senhas não coincidem.');
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      setError('Email inválido. O email deve ser no formato correto.');
+      return;
+    }
+
+    if (!phoneRegex.test(phone)) {
+      setError('Número de telefone inválido. Deve conter exatamente nove dígitos.');
       return;
     }
 

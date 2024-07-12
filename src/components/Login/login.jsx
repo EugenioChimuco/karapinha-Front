@@ -79,7 +79,7 @@ const LoginModal = ({ onClose, onSuccess }) => {
 
   const handleCloseEditProfile = () => {
     setShowEditProfile(false);
-    setError(''); // Limpar a mensagem de erro
+    setError(''); 
   };
 
   return (

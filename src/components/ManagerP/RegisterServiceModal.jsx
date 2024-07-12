@@ -26,6 +26,11 @@ const RegisterServiceModal = ({ onClose, onRegister }) => {
   };
 
   const handleRegister = async () => {
+    if (parseFloat(price) <= 0 || isNaN(parseFloat(price))) {
+      setError('O preço deve ser um valor numérico positivo.');
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append('tipoDeServico', serviceType);
@@ -84,7 +89,7 @@ const RegisterServiceModal = ({ onClose, onRegister }) => {
           <div className="form-group">
             <label htmlFor="price" className="input-label">Preço</label>
             <input
-              type="text"
+              type="number"
               id="price"
               placeholder="Digite o preço"
               value={price}

@@ -51,6 +51,26 @@ const RegisterModal = ({ onClose }) => {
   };
 
   const handleRegister = async () => {
+    if (!nomeCompleto || !bi || !email || !phone || !idCategoria || !photo || selectedHorarios.length === 0) {
+      setError('Todos os campos são obrigatórios.');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError('Email inválido. O email deve ser no formato correto.');
+      return;
+    }
+
+    if (!validateBI(bi)) {
+      setError('BI inválido. Deve conter apenas números e ter um formato específico.');
+      return;
+    }
+
+    if (!validatePhone(phone)) {
+      setError('Número de telefone inválido. Deve conter exatamente nove dígitos.');
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append('nomeCompleto', nomeCompleto);
@@ -88,6 +108,21 @@ const RegisterModal = ({ onClose }) => {
         setError('Ocorreu um erro ao tentar se registrar. Por favor, tente novamente.');
       }
     }
+  };
+
+
+  const validateEmail = (email) => {
+    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/.test(email);
+  };
+
+
+  const validateBI = (bi) => {
+    return /^[0-9]{9}$/.test(bi); 
+  };
+
+
+  const validatePhone = (phone) => {
+    return /^[0-9]{9}$/.test(phone); 
   };
 
   return (

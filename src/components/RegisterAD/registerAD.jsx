@@ -13,6 +13,10 @@ const RegisterModal = ({ onClose }) => {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
 
+  // Expressão regular para validar o formato de email
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/;
+
+  // Função para lidar com a mudança de arquivo de foto
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -20,14 +24,29 @@ const RegisterModal = ({ onClose }) => {
     }
   };
 
+  // Função para lidar com o registro
   const handleRegister = async () => {
+    // Validação dos campos obrigatórios
     if (!username || !password || !confirmPassword || !nomeCompleto || !bi || !email || !phone || !fotoPath) {
       setError('Todos os campos são obrigatórios.');
       return;
     }
 
+    // Validação de senha
     if (password !== confirmPassword) {
       setError('As senhas não coincidem.');
+      return;
+    }
+
+    // Validação de email usando regex
+    if (!emailRegex.test(email)) {
+      setError('Email inválido. O email deve ser no formato correto.');
+      return;
+    }
+
+    // Validação de telefone (apenas números e exatamente 9 dígitos)
+    if (!/^\d{9}$/.test(phone)) {
+      setError('Número de telefone inválido. Deve conter exatamente nove dígitos.');
       return;
     }
 
@@ -48,7 +67,7 @@ const RegisterModal = ({ onClose }) => {
         },
       });
 
-      console.log('Registration successful!', response.data);
+      console.log('Registro realizado com sucesso!', response.data);
       onClose();
     } catch (error) {
       if (error.response) {

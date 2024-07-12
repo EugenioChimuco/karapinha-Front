@@ -22,7 +22,7 @@ const EditAppointmentModal = ({ show, onClose, appointment, onUpdate }) => {
           <label>Nova Data:</label>
           <input type="date" value={newDate} onChange={handleDateChange} min={new Date().toISOString().split('T')[0]} />
           <div className="modal-buttons">
-            <button className="btn-primary" onClick={handleUpdate}>Salvar</button>
+            <button className="btn-primary" onClick={handleUpdate}>Actualizar</button>
           
           </div>
         </div>

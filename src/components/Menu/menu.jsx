@@ -56,34 +56,34 @@ const Menu = () => {
 
   return (
     <div className="menu">
-      <span href="/" className="logo">Karapinha</span>
+      <span href="/" className="menu-logo">Karapinha</span>
       <nav>
         <ul>
           <li><a href="/" className="menu-item">Home</a></li>
           <li><a href="#" className="menu-item">Sobre</a></li>
           <li><a href="/servicos" className="menu-item">Serviços</a></li>
-          <div className='DivCarrinho' onClick={handleCartClick}>
-            <TiShoppingCart className="Carrinho"/>
+          <div className="menu-DivCarrinho" onClick={handleCartClick}>
+            <TiShoppingCart className="menu-Carrinho"/>
             <span>{cartItems.length}</span>
           </div>
         </ul>
       </nav>
       
-      <div className="buttons">
+      <div className="menu-buttons">
         {isLoggedIn ? (
-          <div className="profile-menu">
-            <button className="iconButton" onClick={toggleDropdown}>
-              <AccountCircleIcon className="profileImage" style={{ color: '#000', fontSize: 30 }} />
+          <div className="menu-profile-menu">
+            <button className="menu-iconButton" onClick={toggleDropdown}>
+              <AccountCircleIcon className="menu-profileImage" style={{ color: '#000', fontSize: 30 }} />
             </button>
             {isDropdownOpen && (
-              <div className="dropdown-menu">
-                <button className="dropdown-item" onClick={handleEditProfileClick}>Editar Perfil</button>
-                <button className="dropdown-item" onClick={handleLogout}>Sair</button>
+              <div className="menu-dropdown-menu">
+                <button className="menu-dropdown-item" onClick={handleEditProfileClick}>Editar Perfil</button>
+                <button className="menu-dropdown-item" onClick={handleLogout}>Sair</button>
               </div>
             )}
           </div>
         ) : (
-          <button className="login" onClick={handleLoginClick}>Entrar</button>
+          <button className="menu-login" onClick={handleLoginClick}>Entrar</button>
         )}
       </div>
 

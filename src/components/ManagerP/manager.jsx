@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'react-datepicker/dist/react-datepicker.css';
+import Modal from 'react-modal';
 import './manager.css';
 import { useNavigate } from 'react-router-dom';
 import RegisterModal from './RegisterProfissional';
@@ -8,7 +9,9 @@ import RegisterScheduleModal from './horario';
 import RegisterServiceModal from './RegisterServiceModal';
 import RegisterCategoryModal from './RegisterCategoryModal';
 import EditAppointmentModal from '../EditAppointmentModal/EditAppointmentModal';
+import Dashboard from '../Dashboard/Dashboard';
 
+Modal.setAppElement('#root');
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -28,6 +31,7 @@ const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true'); 
   const [appointmentsWithServices, setAppointmentsWithServices] = useState([]);
   const [editAppointment, setEditAppointment] = useState(null);
+  const [showDashboardModal, setShowDashboardModal] = useState(false);
 
 
 
@@ -68,6 +72,18 @@ const Admin = () => {
     navigate('/');
   };
 
+  const toggleDashboard = () => {
+    setShowDashboardModal(!showDashboardModal);
+  };
+  
+  const handleOpenDashboardModal = () => {
+    setShowDashboardModal(true);
+  };
+
+  const handleCloseDashboardModal = () => {
+    setShowDashboardModal(false);
+  };
+  
   const handleCloseEditAppointmentModal = () => {
     setEditAppointment(null);
   };
@@ -154,7 +170,7 @@ const Admin = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
-
+  
   const handleDeleteProfessional = async (professionalId) => {
     try {
       await axios.delete(`https://localhost:7143/api/Profissional/${professionalId}`);
@@ -221,7 +237,7 @@ const Admin = () => {
     } else if (activeTab === 'categories') {
       setShowRegisterCategoryModal(false);
     } else {
-      setShowRegisterModal(false);A
+      setShowRegisterModal(false);
     }
   };
 
@@ -243,8 +259,7 @@ const Admin = () => {
       console.error('Erro ao editar data da marcação:', error);
     }
   };
-  
-    
+      
   const handleRegister = async (data) => {
     try {
       if (activeTab === 'schedule') {
@@ -363,7 +378,7 @@ const Admin = () => {
           </table>
         );
   
-        case 'appointments':
+      case 'appointments':
         return (
           <table className="custom-table">
             <thead>
@@ -398,14 +413,12 @@ const Admin = () => {
                   <td>{appointment.estadoDeMarcacao ? 'Confirmado' : 'Pendente'}</td>
                   <td>
                     {appointment.estadoDeMarcacao === false && (
-                      <>
-                        <button
-                          className="btn-accept"
-                          onClick={() => handleAcceptAppointment(appointment.idMarcacao)}
-                        >
-                          Aceitar
-                        </button>
-                      </>
+                      <button
+                        className="btn-accept"
+                        onClick={() => handleAcceptAppointment(appointment.idMarcacao)}
+                      >
+                        Aceitar
+                      </button>
                     )}
                     <button
                       className="btn-edit"
@@ -455,16 +468,17 @@ const Admin = () => {
         return null;
     }
   };
-  
+    
   return (
     <div className="admin-container">
       <div className="navbar">
         <div className="navbar-brand">Painel Administrativo</div>
         <div className="nav-links">
+        <button onClick={handleOpenDashboardModal}>Abrir Dashboard</button>
+
           <button className="nav-button" onClick={handleLogout}>Sair</button>
         </div>
       </div>
-
       <div className="submenu">
         <button className={activeTab === 'professional' ? 'active' : ''} onClick={() => handleTabChange('professional')}>Profissional</button>
         <button className={activeTab === 'services' ? 'active' : ''} onClick={() => handleTabChange('services')}>Serviços</button>
@@ -482,6 +496,8 @@ const Admin = () => {
         {renderTable()}
       </div>
 
+
+
       <EditAppointmentModal
         show={!!editAppointment} 
         onClose={handleCloseEditAppointmentModal} 
@@ -489,11 +505,13 @@ const Admin = () => {
         onUpdate={handleUpdateAppointment}
       />
 
+      {showDashboardModal && <Dashboard show={showDashboardModal} handleClose={handleCloseDashboardModal} />}
+
       {showRegisterModal && <RegisterModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
       {showRegisterScheduleModal && <RegisterScheduleModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
       {showRegisterServiceModal && <RegisterServiceModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
       {showRegisterCategoryModal && <RegisterCategoryModal onClose={handleCloseRegisterModal} onRegister={handleRegister} />}
-      
+      {showDashboardModal && <Dashboard  onClose={handleCloseRegisterModal} onRegister={toggleDashboard} />}
     </div>
   );
 };

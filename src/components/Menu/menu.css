@@ -1,3 +1,4 @@
+/* menu.css */
 .menu {
   width: 100%;
   display: flex;
@@ -11,7 +12,7 @@
   left: 0;
 }
 
-nav ul {
+.menu nav ul {
   width: 100%;
   list-style-type: none;
   display: flex;
@@ -20,7 +21,7 @@ nav ul {
   gap: 20px;
 }
 
-nav ul li {
+.menu nav ul li {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -28,7 +29,7 @@ nav ul li {
   margin-top: 8px;
 }
 
-nav ul li a {
+.menu nav ul li a {
   width: 80px;
   display: flex;
   justify-content: center;
@@ -38,24 +39,26 @@ nav ul li a {
   transition: all 0.3s linear;
 }
 
-nav ul li a:hover {
+.menu nav ul li a:hover {
   background-color: #59879d; /* Cor do texto azul */
   text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5); /* Sombra retangular cinza */
   color: #fff;
   padding: 8px 8px;
   border-radius: 8px;
 }
-.DivCarrinho{
+
+.menu-DivCarrinho {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.Carrinho{
+
+.menu-Carrinho {
   font-size: 25px;
   margin-top: 8px;
 }
 
-.logo {
+.menu-logo {
   width: 100%;
   color: #59879d;
   font-size: 38px;
@@ -63,14 +66,14 @@ nav ul li a:hover {
   font-weight: bold;
 }
 
-.buttons {
+.menu-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-left: 25px;
 }
 
-.login {
+.menu-login {
   background-color: #59879d;
   color: #fff;
   border: none;
@@ -80,25 +83,24 @@ nav ul li a:hover {
   border: 1px solid #59879d;
 }
 
-.login:hover {
+.menu-login:hover {
   background-color: #fff;
-
   color: #0755b4;
   transition: all 0.3s linear;
 }
 
-.profile-menu {
+.menu-profile-menu {
   position: relative;
 }
 
-.iconButton {
+.menu-iconButton {
   background: none;
   border: none;
   cursor: pointer;
   margin-right: 40px;
 }
 
-.dropdown-menu {
+.menu-dropdown-menu {
   position: absolute;
   right: 0;
   top: 100%;
@@ -109,7 +111,7 @@ nav ul li a:hover {
   margin-top: 10px; /* Adiciona um pequeno espaço entre o botão e o menu suspenso */
 }
 
-.dropdown-item {
+.menu-dropdown-item {
   display: block;
   padding: 8px 16px;
   cursor: pointer;
@@ -121,7 +123,7 @@ nav ul li a:hover {
   color: #000;
 }
 
-.dropdown-item:hover {
+.menu-dropdown-item:hover {
   background: #f0f0f0;
   color: #000;
 }

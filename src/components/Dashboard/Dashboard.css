@@ -1,0 +1,131 @@
+.dashboard-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dashboard-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dashboard-modal-content {
+  background-color: #fff;
+  padding: 30px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 90vh;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  overflow-y: auto;
+}
+
+.dashboard-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.dashboard-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  background-color: #333;
+  padding: 10px;
+}
+
+.dashboard-tabs button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.dashboard-tabs button:hover {
+  background-color: #444;
+}
+
+.dashboard-tabs button.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.dashboard-tab-content {
+  font-size: 0.9rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.schedule-content {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.schedule-month {
+  margin-bottom: 20px;
+}
+
+.schedule-table-container {
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.schedule-table th {
+  background-color: #f2f2f2;
+}
+
+h2, h3 {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+ul.dashboard-list {
+  list-style: none;
+  padding: 0;
+}
+
+ul.dashboard-list li {
+  margin-bottom: 10px;
+}
+
+ul.dashboard-list li::before {
+  content: "•";
+  color: #333;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}

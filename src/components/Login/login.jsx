@@ -1,9 +1,12 @@
+// LoginModal.jsx
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import './login.css';
 import { RiUserLine } from 'react-icons/ri';
 import { FaFacebookSquare, FaTwitterSquare, FaInstagramSquare } from 'react-icons/fa';
 import RegisterModal from '../Register/register';
+import EditProfileModal from '../EditProfile/editProfile'; // Atualize o caminho conforme necessário
 import { useNavigate } from "react-router-dom";
 
 const LoginModal = ({ onClose, onSuccess }) => {
@@ -11,6 +14,8 @@ const LoginModal = ({ onClose, onSuccess }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showRegister, setShowRegister] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false); // Novo estado para controlar a visibilidade do EditProfileModal
+  const [userId, setUserId] = useState(null); // Novo estado para armazenar o userId
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -21,27 +26,34 @@ const LoginModal = ({ onClose, onSuccess }) => {
       });
 
       console.log('Login successful!', response.data);
-      const userId = response.data.id; 
-      
+      const userId = response.data.id;
+      setUserId(userId); 
+
       if (response?.data?.tipoDeUser === 1) {
-        onSuccess(userId); 
+        onSuccess(userId);
         onClose();
         navigate("/admin");
       } else if (response?.data?.tipoDeUser === 2) {
-        onSuccess(userId); 
-        onClose();
-        navigate("/manager");
+        if (response?.data?.estadoDaConta) {
+          onSuccess(userId);
+          onClose();
+          navigate("/manager");
+        } else {
+          setError('É obrigatório editar os seus dados.');
+          setTimeout(() => {
+            setShowEditProfile(true); 
+          }, 3000);
+        }
       } else if (response?.data?.tipoDeUser === 3) {
         console.log('estadoDoUtilizador:', response?.data?.estadoDoUtilizador);
         if (response?.data?.estadoDoUtilizador) {
-          onSuccess(userId); 
+          onSuccess(userId);
           onClose();
           navigate("/");
-        } else { 
+        } else {
           setError('A sua conta está inativa! Aguarde a ativação da mesma.');
         }
       }
-
     } catch (error) {
       if (error.response) {
         if (error.response.status === 401 || error.response.status === 403) {
@@ -63,6 +75,11 @@ const LoginModal = ({ onClose, onSuccess }) => {
 
   const handleCloseRegister = () => {
     setShowRegister(false);
+  };
+
+  const handleCloseEditProfile = () => {
+    setShowEditProfile(false);
+    setError(''); // Limpar a mensagem de erro
   };
 
   return (
@@ -110,6 +127,7 @@ const LoginModal = ({ onClose, onSuccess }) => {
         </div>
       </div>
       {showRegister && <RegisterModal onClose={handleCloseRegister} />}
+      {showEditProfile && <EditProfileModal userId={userId} onClose={handleCloseEditProfile} />}
     </>
   );
 };

@@ -6,6 +6,7 @@ import EditProfileModal from '../EditProfile/editProfile';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { CartContext } from '../CartContext/CartContext';
 import CartModal from '../CartModal/CartModal';
+import AppointmentsModal from '../AppointmentsModal/AppointmentsModal';
 
 const Menu = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,6 +14,7 @@ const Menu = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isAppointmentsModalOpen, setIsAppointmentsModalOpen] = useState(false); // State for AppointmentsModal
   const [userId, setUserId] = useState(null);
   const { cartItems } = useContext(CartContext);
 
@@ -54,6 +56,11 @@ const Menu = () => {
     setIsCartModalOpen(true);
   };
 
+  const handleAppointmentsClick = () => {
+    setIsDropdownOpen(false);
+    setIsAppointmentsModalOpen(true); // Set state to open AppointmentsModal
+  };
+
   return (
     <div className="menu">
       <span href="/" className="menu-logo">Karapinha</span>
@@ -78,6 +85,7 @@ const Menu = () => {
             {isDropdownOpen && (
               <div className="menu-dropdown-menu">
                 <button className="menu-dropdown-item" onClick={handleEditProfileClick}>Editar Perfil</button>
+                <button className="menu-dropdown-item" onClick={handleAppointmentsClick}>Minhas Marcações</button>
                 <button className="menu-dropdown-item" onClick={handleLogout}>Sair</button>
               </div>
             )}
@@ -90,6 +98,7 @@ const Menu = () => {
       {isModalOpen && <LoginModal onClose={() => setIsModalOpen(false)} onSuccess={handleLoginSuccess} />}
       {isEditProfileModalOpen && <EditProfileModal userId={userId} onClose={() => setIsEditProfileModalOpen(false)} />}
       {isCartModalOpen && <CartModal onClose={() => setIsCartModalOpen(false)} />}
+      {isAppointmentsModalOpen && <AppointmentsModal userId={userId} onClose={() => setIsAppointmentsModalOpen(false)} />} {/* Render AppointmentsModal */}
     </div>
   );
 };
